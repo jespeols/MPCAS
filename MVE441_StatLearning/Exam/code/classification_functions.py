@@ -20,14 +20,7 @@ def get_accuracy(y_pred, y_test):
 
 def get_class_level_accuracy(y_pred, y_test, num_classes):
     class_accuracy = []
-    # option 1 - IS JUST PRECISION?
-    # for i in range(num_classes):
-    #     accurate_predictions = np.sum((y_test == i+1) & (y_pred == i+1)) 
-    #     total_predictions = np.sum(y_pred == i+1)
         
-    #     class_accuracy.append(accurate_predictions/total_predictions)
-        
-    # option 2 - IS JUST RECALL?
     for i in range(num_classes):
         accurate_positives = np.sum((y_test == i+1) & (y_pred == i+1)) 
         total_positives = np.sum(y_test == i+1)
@@ -111,78 +104,26 @@ def evaluate_classifier(classifier, X_train, y_train, X_test, y_test, average_se
     
     return y_pred, accuracy, accuracy_classes, f1_score_avg, f1_score_classes
 
-
-def summarize_classifier_results(classifier_dict, results, return_df=False, visualize=False):
     
-    accuracy_scores = results['accuracy_scores']
-    accuracy_classes = results['accuracy_scores_classes']
-    f1_scores = results['f1_scores']
-    f1_scores_classes = results['f1_scores_classes']
-    
-    df_scores = pd.DataFrame({'Classifier': list(classifier_dict.keys()), 
-                          'Accuracy': accuracy_scores, 
-                          'Acc. C1': accuracy_classes[:, 0],
-                          'Acc. C2': accuracy_classes[:, 1],
-                          'Acc. C3': accuracy_classes[:, 2],
-                          'Acc. C4': accuracy_classes[:, 3],
-                          'F1 score': f1_scores,
-                          'F1 C1': f1_scores_classes[:, 0],
-                          'F1 C2': f1_scores_classes[:, 1],
-                          'F1 C3': f1_scores_classes[:, 2],
-                          'F1 C4': f1_scores_classes[:, 3]})
-
-    value_vars_acc = ['Accuracy', 'Acc. C1', 'Acc. C2', 'Acc. C3', 'Acc. C4']
-    df_scores_acc = pd.melt(df_scores, id_vars=['Classifier'], value_vars=value_vars_acc, var_name='Metric', value_name='Score')
-    value_vars_f1 = ['F1 score', 'F1 C1', 'F1 C2', 'F1 C3', 'F1 C4']
-    df_scores_f1 = pd.melt(df_scores, id_vars=['Classifier'], value_vars=value_vars_f1, 
-                        var_name='Metric', value_name='Score')
-
-    if visualize:
-        plt.figure(figsize=(18, 8))
-        colors_classes = ["#0079FF", "#12E6D0", "#7BE600", "#00A336"]
-        
-        plt.subplot(1, 2, 1)
-        colors_metrics = ["#E69F00", "#D55E00"]
-        palette_acc = sns.color_palette([colors_metrics[0]]+colors_classes)
-        sns.barplot(x='Classifier', y='Score', hue='Metric', data=df_scores_acc, palette=palette_acc)
-        plt.title('Accuracy scores')
-        plt.legend(loc='center right')
-
-        plt.subplot(1, 2, 2)
-        palette_partial = sns.color_palette([colors_metrics[1]]+colors_classes)
-        plt.title('F1 scores')
-        sns.barplot(x='Classifier', y='Score', hue='Metric', data=df_scores_f1, palette=palette_partial)
-        plt.legend(loc='center right')
-        plt.show()
-    
-    if return_df:
-        df_summary = pd.DataFrame({'Classifier': list(classifier_dict.keys()),
-                                   'Accuracy': accuracy_scores,
-                                   'Acc. C1': accuracy_classes[:, 0],
-                                   'Acc. C2': accuracy_classes[:, 1],
-                                   'F1 score': f1_scores,
-                                   'F1 C1': f1_scores_classes[:, 0],
-                                   'F1 C2': f1_scores_classes[:, 1]}, 
-                                  columns=['Classifier', 'Accuracy', 'Acc. C1', 'Acc. C2',
-                                           'F1 score', 'F1 C1', 'F1 C2'])  
-        return df_summary
-    
-def save_classifier_results_as_table(path_name, df_summary):
-    df_summary.to_latex(path_name, index=False, bold_rows=True, float_format="%.3f", column_format='l|c|c|c|c|c|c|c|c|c|c')
+def save_classifier_results_as_table(path_name, df_results, column_format='l|c|c|c|c|c|c|c|c|c|c'):
+    df_results.to_latex(path_name, index=False, bold_rows=True, float_format="%.3f", column_format=column_format)
     
     
 def generate_classifier_results(X_train, y_train, X_test, y_test, classifiers=['RF', 'KNN', 'LDA', 'LR', 'NB', 'SVM']
                                 , average_setting='macro', visualize_cv=False, print_results=False):
     
     num_classes = len(np.unique(y_train))
+    
     # cross-validation
-    n_estimators_list = np.arange(200, 650, 50)
-    best_n_estimators = cv_optimize_RF(n_estimators_list, X_train, y_train, visualize_cv=visualize_cv)
-    print("Optimized number of estimators:", best_n_estimators, "\n")
+    if 'RF' in classifiers:
+        n_estimators_list = np.arange(200, 650, 50)
+        best_n_estimators = cv_optimize_RF(n_estimators_list, X_train, y_train, visualize_cv=visualize_cv)
+        print("Optimized number of estimators:", best_n_estimators, "\n")
 
-    n_neighbors_list = np.arange(1, 51, 1)
-    best_n_neighbors = cv_optimize_KNN(n_neighbors_list, X_train, y_train, visualize_cv=visualize_cv)
-    print("Optimized number of neighbors:", best_n_neighbors, "\n")
+    if 'KNN' in classifiers:
+        n_neighbors_list = np.arange(1, 51, 1)
+        best_n_neighbors = cv_optimize_KNN(n_neighbors_list, X_train, y_train, visualize_cv=visualize_cv)
+        print("Optimized number of neighbors:", best_n_neighbors, "\n")
 
     classifiers_dict = {
         'RF': RandomForestClassifier(n_estimators=best_n_estimators, random_state=1234, n_jobs=-1) if 'RF' in classifiers else None,
