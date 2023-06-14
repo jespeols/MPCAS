@@ -1,0 +1,13 @@
+name: HW_C
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - scikit-learn
+  - pandas
+  - jupyter
+  - seaborn
+  - pip:
+    - deeptrack
+prefix: C:\Users\jespe\anaconda3\envs\HW_C_env

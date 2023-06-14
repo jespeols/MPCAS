@@ -1,0 +1,11 @@
+name: HW_D
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib
+  - scipy
+  - jupyter
+  - scikit-learn
+prefix: C:\Users\jespe\anaconda3\envs\HW_D_env
