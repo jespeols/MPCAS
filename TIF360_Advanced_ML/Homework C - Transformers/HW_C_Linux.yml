@@ -1,0 +1,24 @@
+name: HW_C
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - conda-forge::cudatoolkit=11.8.0
+  - jupyter
+  - pytest
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - pandas
+  - pip
+  - pip:
+    - nvidia-cudnn-cu11==8.6.0.163
+    - tensorflow==2.12.*
+    - deeptrack
+    - cupy-cuda11x
+prefix: /home/jespeols/miniconda3/envs/HW_C
+
+# After creating the environment, add CUDA to path (initialized when activating the environment) using the following commands:
+    # mkdir -p $CONDA_PREFIX/etc/conda/activate.d
+    # echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+    # echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/:$CUDNN_PATH/lib' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
